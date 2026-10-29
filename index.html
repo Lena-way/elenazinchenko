@@ -1111,7 +1111,7 @@ section{padding:5rem clamp(1.5rem,6vw,6rem);}
   <div class="hero-stats">
     <div class="stat"><div class="stat-n">12</div><div class="stat-l">тренировок</div></div>
     <div class="stat"><div class="stat-n">4</div><div class="stat-l">недели</div></div>
-    <div class="stat"><div class="stat-n">$19</div><div class="stat-l">стоимость</div></div>
+    <div class="stat"><div class="stat-n">$15</div><div class="stat-l">стоимость</div></div>
   </div>
 </section>
 
@@ -1417,9 +1417,17 @@ section{padding:5rem clamp(1.5rem,6vw,6rem);}
   <div class="pricing-card r">
     <span class="pricing-tag">Специальная цена</span>
     <div class="pricing-name">Базовый курс · 4 недели</div>
+    <div class="countdown-wrap">
+      <p class="countdown-label">Цена $15 действует ещё</p>
+      <div class="countdown-timer" id="countdown">
+        <div class="countdown-block"><span id="cd-min">30</span><span class="countdown-unit">мин</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-block"><span id="cd-sec">00</span><span class="countdown-unit">сек</span></div>
+      </div>
+    </div>
     <div class="price-row">
       <span class="price-orig">$29</span>
-      <span class="price-now">$19</span>
+      <span class="price-now">$15</span>
     </div>
     <p class="price-note">Доступ навсегда · 12 тренировок · без оборудования</p>
     <ul class="pricing-features">
@@ -1429,7 +1437,7 @@ section{padding:5rem clamp(1.5rem,6vw,6rem);}
       <li>Без специального оборудования — только коврик</li>
       <li>Подходит для начинающих</li>
     </ul>
-    <a href="https://elenazinchenko.gumroad.com/l/ercyz" target="_blank" rel="noopener" class="pricing-cta">Купить курс за $19</a>
+    <a href="https://elenazinchenko.gumroad.com/l/ercyz" target="_blank" rel="noopener" class="pricing-cta">Купить курс за $15</a>
   </div>
 </section>
 
@@ -1976,6 +1984,103 @@ function closeLegal() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeLegal();
 });
+</script>
+
+<style>
+#cookie-banner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:var(--white);border-top:1px solid var(--line);
+  padding:1rem 1.25rem calc(1rem + env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;gap:.75rem;
+  box-shadow:0 -4px 24px rgba(28,26,23,.08);
+}
+.cookie-text{font-size:.8rem;color:var(--muted);line-height:1.6;}
+.cookie-text a{color:var(--accent);text-decoration:underline;}
+.cookie-btns{display:flex;gap:.6rem;flex-wrap:wrap;}
+.cookie-accept{
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:.78rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:.55rem 1.4rem;border-radius:2rem;
+}
+.cookie-decline{
+  background:transparent;color:var(--muted);border:1px solid var(--line);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:.78rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:.55rem 1.2rem;border-radius:2rem;
+}
+</style>
+
+<div id="cookie-banner" hidden>
+  <p class="cookie-text">Мы используем cookies для аналитики и показа персонализированной рекламы. Продолжая использовать сайт, вы соглашаетесь с нашей <a href="#" onclick="openLegal();return false;">политикой конфиденциальности</a>.</p>
+  <div class="cookie-btns">
+    <button class="cookie-accept" id="cookie-ok">Принять</button>
+    <button class="cookie-decline" id="cookie-no">Только необходимые</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var banner = document.getElementById('cookie-banner');
+  try {
+    if (!localStorage.getItem('elzi_cookies')) banner.hidden = false;
+  } catch(e) { banner.hidden = false; }
+
+  function accept(all){
+    banner.hidden = true;
+    try { localStorage.setItem('elzi_cookies', all ? 'all' : 'essential'); } catch(e){}
+  }
+  document.getElementById('cookie-ok').addEventListener('click', function(){ accept(true); });
+  document.getElementById('cookie-no').addEventListener('click', function(){ accept(false); });
+})();
+</script>
+
+<style>
+.countdown-wrap{margin:1rem 0 1.2rem;text-align:center;}
+.countdown-label{font-family:'DM Sans',sans-serif;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.countdown-timer{display:flex;align-items:center;justify-content:center;gap:.25rem;}
+.countdown-block{display:flex;flex-direction:column;align-items:center;background:var(--accent);color:#fff;border-radius:8px;padding:.4rem .8rem;min-width:3.5rem;}
+.countdown-block span:first-child{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;line-height:1;}
+.countdown-unit{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-top:.1rem;}
+.countdown-sep{font-size:1.8rem;color:var(--accent);font-weight:300;margin-bottom:.8rem;}
+</style>
+
+<script>
+(function(){
+  var KEY = 'elzi_cd_end';
+  var DURATION = 30 * 60 * 1000; // 30 минут
+  var end;
+  try {
+    var stored = localStorage.getItem(KEY);
+    if (stored) {
+      end = parseInt(stored, 10);
+      if (Date.now() > end) {
+        end = Date.now() + DURATION;
+        localStorage.setItem(KEY, end);
+      }
+    } else {
+      end = Date.now() + DURATION;
+      localStorage.setItem(KEY, end);
+    }
+  } catch(e) {
+    end = Date.now() + DURATION;
+  }
+
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+
+  function tick(){
+    var left = end - Date.now();
+    if (left <= 0) {
+      document.getElementById('cd-min').textContent = '00';
+      document.getElementById('cd-sec').textContent = '00';
+      return;
+    }
+    var m = Math.floor(left / 60000);
+    var s = Math.floor((left % 60000) / 1000);
+    document.getElementById('cd-min').textContent = pad(m);
+    document.getElementById('cd-sec').textContent = pad(s);
+    setTimeout(tick, 500);
+  }
+  tick();
+})();
 </script>
 
 </body></html>
